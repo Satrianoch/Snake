@@ -9,9 +9,30 @@
 <script>
 	var snakeGame, kaa;
 	
-	snakeGame = new SnakeGame(450, 300, 25, 500);
+	snakeGame = new SnakeGame(450, 300, 25, 150);
 	kaa = new Snake([[2,5], [1,5], [0,5]], 'right');
 	snakeGame.init(kaa);
+	
+	document.addEventListener('keydown', function(e)
+	{
+		let direction = kaa.direction;
+		switch(e.key)
+		{
+			case 'ArrowRight':
+				direction = direction === 'left' ? 'left' : 'right';
+				break;
+			case 'ArrowDown':
+				direction = direction === 'up' ? 'up' : 'down';
+				break;
+			case 'ArrowUp':
+				direction = direction === 'down' ? 'down' : 'up';
+				break;
+			case 'ArrowLeft':
+				direction = direction === 'right' ? 'right' : 'left';
+				break;
+		}
+		kaa.direction = direction;
+	});
 	
 	function SnakeGame(canvasWidth, canvasHeight, blockSize, delay)
 	{
@@ -73,7 +94,7 @@
 						x--;
 						break;
 					case "up":		
-						y++;
+						y--;
 						break;
 					case "down":		
 						y++;
