@@ -9,13 +9,16 @@
 <script>
 	var snakeGame, kaa;
 	
-	snakeGame = new SnakeGame(450, 300, 25, 150);
-	kaa = new Snake([[2,5], [1,5], [0,5]], 'right');
-	snakeGame.init(kaa);
+	window.onload = function()
+	{
+		snakeGame = new SnakeGame(450, 300, 25, 100);
+		kaa = new Snake([[5,5],[4,5],[3,5],[2,5],[1,5],[0,5]], 'right');
+		snakeGame.init(kaa);
+	}
 	
 	document.addEventListener('keydown', function(e)
 	{
-		let direction = kaa.direction;
+		let direction = snakeGame.snake.direction;
 		switch(e.key)
 		{
 			case 'ArrowRight':
@@ -30,9 +33,13 @@
 			case 'ArrowLeft':
 				direction = direction === 'right' ? 'right' : 'left';
 				break;
+			case ' ':
+				kaa = new Snake([[5,5],[4,5],[3,5],[2,5],[1,5],[0,5]], 'right');
+				snakeGame.init(kaa);
+				return;
 		}
-		kaa.direction = direction;
-	});
+		snakeGame.snake.direction = direction;
+	})
 	
 	function SnakeGame(canvasWidth, canvasHeight, blockSize, delay)
 	{
@@ -51,6 +58,19 @@
 		var instance = this,
 				timeout;
 		
+		var refreshCanvas = function()
+		{
+			instance.snake.advance();
+			if(instance.checkCollision())
+				instance.gameOver();
+			else
+			{
+				instance.ctx.clearRect(0, 0, instance.canvas.width, instance.canvas.height);
+				instance.snake.draw(instance.ctx, instance.blockSize);
+				timeout = setTimeout(refreshCanvas, instance.delay);
+			}
+		};
+		
 		this.init = function(snake)
 		{
 			this.snake = snake;
@@ -59,13 +79,34 @@
 			refreshCanvas();
 		};
 		
-		var refreshCanvas = function()
+		this.gameOver = function()
 		{
-			instance.snake.advance();
-			instance.ctx.clearRect(0, 0, instance.canvas.width, instance.canvas.height);
-			instance.snake.draw(instance.ctx, instance.blockSize);
-			timeout = setTimeout(refreshCanvas, instance.delay);
+			this.ctx.save();
+			this.ctx.fillSyle = '#000';
+			this.ctx.fillText('Game Over', 10, 20);
+			this.ctx.fillText('Appuyer sur ESPACE pour rejouer', 10, 35);
+			this.ctx.restore();
 		}
+		
+		this.checkCollision = function()
+		{
+			let body = this.snake.position, 
+					headX = this.snake.position[0][0],
+					headY = this.snake.position[0][1],
+					borderX = this.canvas.width/this.blockSize,
+					borderY = this.canvas.height/this.blockSize,
+					wallCollision = false,
+					selfCollision = false;
+	
+			if(headX < 0 || headX >= borderX || headY < 0 || headY >= borderY)
+				wallCollision = true;
+			
+			for(let i = 1; i < this.snake.position.length; i++)
+				if(headX === body[i][0] && headY === body[i][1])
+					selfCollision = true;
+			
+			return wallCollision || selfCollision;
+		};
 	}
 	
 	function Snake(position, direction)
