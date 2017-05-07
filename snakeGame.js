@@ -36,12 +36,13 @@ function SnakeGame(canvasWidth, canvasHeight, blockSize, delay)
 				}while(instance.apple.isOnSnake(instance.snake))
 				instance.snake.ateApple = true;
 				instance.score++;
+				instance.delay--;
 				console.log(instance.score);
 			}
 			instance.ctx.clearRect(0, 0, instance.canvas.width, instance.canvas.height);
-			instance.drawScore();
 			instance.snake.draw(instance.ctx, instance.blockSize);
 			instance.apple.draw(instance.ctx, instance.blockSize);
+			instance.drawScore();
 			timeout = setTimeout(refreshCanvas, instance.delay);
 		}
 	};
@@ -50,6 +51,7 @@ function SnakeGame(canvasWidth, canvasHeight, blockSize, delay)
 	{
 		this.snake = snake;
 		this.apple = apple;
+		this.delay = delay;
 		this.score = 0;
 		snake.draw(this.ctx, this.blockSize);
 		apple.draw(this.ctx, this.blockSize);
