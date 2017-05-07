@@ -4,7 +4,7 @@
 	<meta charset="UTF-8">
 	<title>Snake</title>
 </head>
-<body style='background-color:white'>
+<body>
 </body>
 <script>
 	var snakeGame, kaa, applee;
@@ -50,7 +50,7 @@
 		this.blockSize = blockSize;
 		this.canvas.width = canvasWidth;
 		this.canvas.height = canvasHeight;
-		this.canvas.style.border = '1px solid';
+		this.canvas.style.border = '1px solid #ddd';
 		this.canvas.style.margin = '0 auto';
 		this.canvas.style.display = 'block';
 		this.canvas.style.marginTop = '50vh';
@@ -67,6 +67,14 @@
 				instance.gameOver();
 			else
 			{
+        if(instance.snake.isEatingApple(instance.apple))
+        {
+          do
+          {
+            instance.apple.setNewPosition(instance.blockSize, instance.canvas.width, instance.canvas.height);
+          }while(instance.apple.isOnSnake(instance.snake))
+          instance.snake.ateApple = true;
+        }
 				instance.ctx.clearRect(0, 0, instance.canvas.width, instance.canvas.height);
 				instance.snake.draw(instance.ctx, instance.blockSize);
         instance.apple.draw(instance.ctx, instance.blockSize);
@@ -91,7 +99,7 @@
 			this.ctx.fillText('Game Over', 10, 20);
 			this.ctx.fillText('Appuyer sur ESPACE pour rejouer', 10, 35);
 			this.ctx.restore();
-		}
+		};
 		
 		this.checkCollision = function()
 		{
@@ -118,6 +126,7 @@
 	{
 		this.position = position;
 		this.direction = direction;
+    this.ateApple = false;
 		this.draw = function(ctx, blockSize)
 		{
 			ctx.save();
@@ -148,9 +157,27 @@
 					default:
 						x++;
 				}
+      
 			this.position.unshift([x, y]);
-			this.position.pop();
+      if(!this.ateApple)
+		    this.position.pop();
+      else
+        this.ateApple = false;      
 		};
+    
+    this.isEatingApple = function(apple)
+    {
+      let headX = this.position[0][0],
+		      headY = this.position[0][1],
+          appleX = apple.position[0],
+          appleY = apple.position[1],
+          isEatingApple = false;
+      
+      if(headX === appleX && headY === appleY)
+        isEatingApple = true;
+      
+      return isEatingApple;
+    };
 	}
   
   function Apple(position)
@@ -165,6 +192,27 @@
       ctx.arc((this.position[0] * blockSize) + radius, (this.position[1] * blockSize) + radius, radius, 0, 2*Math.PI);
       ctx.fill();
       ctx.restore();
+    };
+    
+    this.isOnSnake = function(snake)
+    {
+      let isOnSnake = false;
+      for(let i = 0; i < snake.position.length; i++)
+      {
+        if(snake.position[i][0] === this.position[0] &&
+          snake.position[i][1] === this.position[1])
+            isOnSnake = true;
+      }
+      
+      return isOnSnake;
+    };
+    
+    this.setNewPosition = function(blockSize, canvasWidth, canvasHeight)
+    {
+      let maxX = canvasWidth/blockSize,
+          maxY = canvasHeight/blockSize;
+      this.position[0] = Math.round(Math.random() * (maxX - 1));
+      this.position[1] = Math.round(Math.random() * (maxY - 1));
     };
   }
 </script>
