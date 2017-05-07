@@ -38,6 +38,7 @@
 				kaa = new Snake([[2,5],[1,5],[0,5]], 'right');
         applee = new Apple([8,8]);
 				snakeGame.init(kaa, applee);
+        snakeGame.score = 0;
 				return;
 		}
 		snakeGame.snake.direction = direction;
@@ -56,9 +57,10 @@
 		this.canvas.style.marginTop = '50vh';
 		this.canvas.style.transform =  'translateY(-50%)';
 		document.body.appendChild(this.canvas);
-		this.delay = delay;
-		var instance = this,
-				timeout;
+		this.delay = delay,
+    this.score = 0;
+		var instance = this;
+		var timeout;
 		
 		var refreshCanvas = function()
 		{
@@ -74,10 +76,13 @@
             instance.apple.setNewPosition(instance.blockSize, instance.canvas.width, instance.canvas.height);
           }while(instance.apple.isOnSnake(instance.snake))
           instance.snake.ateApple = true;
+          instance.score += 1;
+          console.log(instance.score);
         }
 				instance.ctx.clearRect(0, 0, instance.canvas.width, instance.canvas.height);
 				instance.snake.draw(instance.ctx, instance.blockSize);
         instance.apple.draw(instance.ctx, instance.blockSize);
+        instance.drawScore();
 				timeout = setTimeout(refreshCanvas, instance.delay);
 			}
 		};
@@ -92,6 +97,14 @@
 			refreshCanvas();
 		};
 		
+    this.drawScore = function()
+    {
+      this.ctx.save();
+			this.ctx.fillSyle = '#000';
+			this.ctx.fillText(this.score, 10, this.canvas.height - 10);
+      this.ctx.restore();
+    }
+    
 		this.gameOver = function()
 		{
 			this.ctx.save();
@@ -209,10 +222,10 @@
     
     this.setNewPosition = function(blockSize, canvasWidth, canvasHeight)
     {
-      let maxX = canvasWidth/blockSize,
-          maxY = canvasHeight/blockSize;
-      this.position[0] = Math.round(Math.random() * (maxX - 1));
-      this.position[1] = Math.round(Math.random() * (maxY - 1));
+      let maxX = canvasWidth/blockSize - 1,
+          maxY = canvasHeight/blockSize - 1;
+      this.position[0] = Math.round(Math.random() * maxX);
+      this.position[1] = Math.round(Math.random() * maxY);
     };
   }
 </script>
