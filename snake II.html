@@ -7,13 +7,14 @@
 <body style='background-color:white'>
 </body>
 <script>
-	var snakeGame, kaa;
+	var snakeGame, kaa, applee;
 	
 	window.onload = function()
 	{
 		snakeGame = new SnakeGame(450, 300, 25, 100);
-		kaa = new Snake([[5,5],[4,5],[3,5],[2,5],[1,5],[0,5]], 'right');
-		snakeGame.init(kaa);
+		kaa = new Snake([[2,5],[1,5],[0,5]], 'right');
+    applee = new Apple([8,8]);
+		snakeGame.init(kaa, applee);
 	}
 	
 	document.addEventListener('keydown', function(e)
@@ -34,8 +35,9 @@
 				direction = direction === 'right' ? 'right' : 'left';
 				break;
 			case ' ':
-				kaa = new Snake([[5,5],[4,5],[3,5],[2,5],[1,5],[0,5]], 'right');
-				snakeGame.init(kaa);
+				kaa = new Snake([[2,5],[1,5],[0,5]], 'right');
+        applee = new Apple([8,8]);
+				snakeGame.init(kaa, applee);
 				return;
 		}
 		snakeGame.snake.direction = direction;
@@ -67,14 +69,17 @@
 			{
 				instance.ctx.clearRect(0, 0, instance.canvas.width, instance.canvas.height);
 				instance.snake.draw(instance.ctx, instance.blockSize);
+        instance.apple.draw(instance.ctx, instance.blockSize);
 				timeout = setTimeout(refreshCanvas, instance.delay);
 			}
 		};
 		
-		this.init = function(snake)
+		this.init = function(snake, apple)
 		{
 			this.snake = snake;
+      this.apple = apple;
 			snake.draw(this.ctx, this.blockSize);
+      apple.draw(this.ctx, this.blockSize);
 			clearTimeout(timeout);
 			refreshCanvas();
 		};
@@ -116,7 +121,7 @@
 		this.draw = function(ctx, blockSize)
 		{
 			ctx.save();
-			ctx.fillStyle = '#BADA55';
+			ctx.fillStyle = '#BAC9FE';
 			for(let i = 0; i < this.position.length; i++)
 				ctx.fillRect((this.position[i][0] * blockSize) - 1, (this.position[i][1] * blockSize) - 1, blockSize, blockSize);
 			ctx.restore();
@@ -147,5 +152,20 @@
 			this.position.pop();
 		};
 	}
+  
+  function Apple(position)
+  {
+    this.position = position;
+    this.draw = function(ctx, blockSize)
+    {
+      ctx.save();
+      ctx.fillStyle = '#BADA55';
+      ctx.beginPath();
+      let radius = blockSize/2;
+      ctx.arc((this.position[0] * blockSize) + radius, (this.position[1] * blockSize) + radius, radius, 0, 2*Math.PI);
+      ctx.fill();
+      ctx.restore();
+    };
+  }
 </script>
 </html>
